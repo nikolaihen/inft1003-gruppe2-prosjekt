@@ -4,7 +4,7 @@ import Game from'./scenes/Game.js';
 export default new Phaser.Game({
   type: Phaser.CANVAS,
   width: 480,
-  height: 640,
+  height: 800,
   canvas: document.querySelector('canvas'),
   scene: Game,
   physics: {
