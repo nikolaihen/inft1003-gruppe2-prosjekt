@@ -16,6 +16,10 @@ export default class Game extends Phaser.Scene {
     this.load.image('player-facing-right', 'assets/man-facing-right.png');
     this.load.image('player-facing-left', 'assets/man-facing-left.png');
     
+    // Load button assets
+    this.load.image('pplay_button', 'assets/Play_BTN.png')
+    this.load.image('pause_button', 'assets/Pause_BTN.png')
+
     // Load background image
     this.load.image('background', 'assets/bg_layer1.png');
 
@@ -24,11 +28,18 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
+    this.pauseButton = document.getElementById('pauseBtn');
+
+    this.pauseButton.addEventListener('click', (event) => {
+      this.onGamePausedOrResumed();
+    });
+
+    this.game.scale.updateBounds();
+
     // Draw the background image first
-    this.add.image(this.centerX, this.centerY, 'background');
+    this.background = this.add.image(this.centerX, this.centerY, 'background');
 
     // Create a new intance of the Player class
-
     // "this" here is a reference to this class (the Game scene)
     this.player = new Player(this, this.width / 2, this.height);
 
@@ -51,10 +62,37 @@ export default class Game extends Phaser.Scene {
     this.physics.add.collider(this.platforms, this.player, () => {
       console.log('Colision detected between the player and one of the platforms');
     });
+
+    const pauseStyle = {
+      font: "bold 32px Arial", 
+      fill: "#fff", 
+      boundsAlignH: "center", 
+      boundsAlignV: "middle"
+    };
+
+    this.pauseText = this.add
+        .text(this.width / 2 - 150, this.height / 2 - 25, 'Game is paused', pauseStyle)
+        .setShadow(3, 3, 'rgba(0,0,0,0.5)', 2)
+        .setDisplaySize(300, 50)
+        .setVisible(false)
   }
 
   // Update game objects
   update() {
     this.player.update();
   }
+
+  onGamePausedOrResumed() {
+    if (this.scene.isPaused()) {
+      this.background.setAlpha(1.0)
+      this.pauseText.setVisible(false);
+      this.scene.resume();
+      this.pauseButton.innerText = 'Pause game'
+    } else {
+      this.background.setAlpha(0.7)
+      this.pauseText.setVisible(true);
+      this.scene.pause();
+      this.pauseButton.innerText = 'Resume game'
+    }
+  } 
 }

@@ -1,1 +1,3 @@
-import Phaser from './src/game/lib/phaser.js';
+$(document).ready(() => {
+  $('#menu').load("./src/website/menu/menu.html")
+});

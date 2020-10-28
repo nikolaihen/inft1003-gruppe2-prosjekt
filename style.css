@@ -1,0 +1,32 @@
+body {
+  height: 100vh;
+  flex-direction: column;
+  box-sizing: border-box;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url('./assets/background_pixel_art.png')
+}
+
+canvas {
+  display: none;
+}
+
+.visible {
+  display: flex !important;
+}
+
+.invisible {
+  display: none;
+}
+
+.gameContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.gameControls {
+  display: none;
+  flex-direction: column;
+}
