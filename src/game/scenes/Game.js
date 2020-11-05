@@ -30,8 +30,8 @@ export default class Game extends Phaser.Scene {
   create() {
     this.pauseButton = document.getElementById('pauseBtn');
 
-    this.pauseButton.addEventListener('click', (event) => {
-      this.onGamePausedOrResumed();
+    this.pauseButton.addEventListener('click', () => {
+      this.scene.isPaused() ? this.onGameResumed() : this.onGamePaused();
     });
 
     this.game.scale.updateBounds();
@@ -63,6 +63,11 @@ export default class Game extends Phaser.Scene {
       console.log('Colision detected between the player and one of the platforms');
     });
 
+    this.pauseOverlay = this.add
+        .rectangle(this.width / 2, this.height / 2, 480, 800, 'black', 0.5)
+        .setActive(false)
+        .setVisible(false);
+
     const pauseStyle = {
       font: "bold 32px Arial", 
       fill: "#fff", 
@@ -82,17 +87,17 @@ export default class Game extends Phaser.Scene {
     this.player.update();
   }
 
-  onGamePausedOrResumed() {
-    if (this.scene.isPaused()) {
-      this.background.setAlpha(1.0)
-      this.pauseText.setVisible(false);
-      this.scene.resume();
-      this.pauseButton.innerText = 'Pause game'
-    } else {
-      this.background.setAlpha(0.7)
-      this.pauseText.setVisible(true);
-      this.scene.pause();
-      this.pauseButton.innerText = 'Resume game'
-    }
-  } 
+  onGameResumed() {
+    this.pauseOverlay.setVisible(false);
+    this.pauseText.setVisible(false);
+    this.scene.resume();
+    this.pauseButton.innerText = 'Pause game'
+  }
+
+  onGamePaused() {
+    this.pauseOverlay.setVisible(true);
+    this.pauseText.setVisible(true);
+    this.scene.pause();
+    this.pauseButton.innerText = 'Resume game'
+  }
 }
