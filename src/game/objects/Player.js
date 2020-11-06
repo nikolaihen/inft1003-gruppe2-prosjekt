@@ -39,7 +39,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
      * the asset 'player-facing-right' inside the preload function in the Game class 
      * inside the file src/scenes/Game.js.
      */
-    super(scene, x, y, 'player-facing-right');
+    super(scene, x, y, 'player');
 
     /*
      * "this" always refers to the class it is used in. By setting "this.scene = scene",
@@ -69,8 +69,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
      * "this.setCollideWorldBounds(true)" makes sure that this object cant exceed the game's borders.
      * Remember that this is only done once - when we instantiate this object using "new Player(scene, x, y)"
      */
-    this.setScale(1.5)
+    this.setScale(3)
     this.setCollideWorldBounds(true);
+    this.anims.play('player');
   }
 
   /*
@@ -92,14 +93,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
      */
     const cursors = this.scene.cursors;
 
-    if (cursors.right.isDown) {
-      this.setVelocityX(300);
-    } else if (cursors.left.isDown) {
-      this.setVelocityX(-300);
-    } else if (cursors.right.isUp && this.body.velocity.x > 0) {
-      this.setVelocityX(0);
-    } else if (cursors.left.isUp && this.body.velocity.x < 0) {
-      this.setVelocityX(0);
+    if (this.y + this.displayHeight / 2 >= this.scene.height) {
+      if (cursors.right.isDown) {
+        this.setVelocityX(300);
+      } else if (cursors.left.isDown) {
+        this.setVelocityX(-300);
+      } else if (cursors.right.isUp && this.body.velocity.x > 0) {
+        this.setVelocityX(0);
+      } else if (cursors.left.isUp && this.body.velocity.x < 0) {
+        this.setVelocityX(0);
+      }
     }
   }
 }
