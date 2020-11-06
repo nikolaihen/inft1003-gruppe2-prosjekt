@@ -1,6 +1,18 @@
 import Phaser from '../lib/phaser.js';
+
+// Enums
+import BorderSide from '../enums/Borderside.js';
+
+// Game objects
 import Platform from '../objects/Platform.js';
 import Player from '../objects/Player.js';
+import Portalgun from '../objects/Portalgun.js';
+import Laser from '../objects/Laser.js';
+import PauseOverlay from '../objects/PauseOverlay.js';
+import PauseText from '../objects/PauseText.js';
+
+// Input handler
+import InputHandler from '../InputHandler.js';
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -12,29 +24,42 @@ export default class Game extends Phaser.Scene {
     this.height = this.game.config.height;
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    // Load player images
-    this.load.image('player-facing-right', 'assets/man-facing-right.png');
-    this.load.image('player-facing-left', 'assets/man-facing-left.png');
-    
-    // Load button assets
-    this.load.image('pplay_button', 'assets/Play_BTN.png')
-    this.load.image('pause_button', 'assets/Pause_BTN.png')
+    this.load.spritesheet({
+      key: 'player', 
+      url: 'assets/spritesheets/idle.png',
+      frameConfig: {
+        frameWidth: 19,
+        frameHeight: 25,
+        startFrame: 0,
+        endFrame: 3
+      },
+    });
 
     // Load background image
     this.load.image('background', 'assets/bg_layer1.png');
 
     // Load platform image
     this.load.image('platform', 'assets/ground_grass.png');
+
+    // Load portal gun
+    this.load.image('portalgun', 'assets/portal-gun.png');
+
+    // Load laser
+    this.load.image('laser', 'assets/laserbeam.png');
   }
 
   create() {
-    this.pauseButton = document.getElementById('pauseBtn');
+    new InputHandler(this);
 
-    this.pauseButton.addEventListener('click', () => {
-      this.scene.isPaused() ? this.onGameResumed() : this.onGamePaused();
+    this.anims.create({
+      key: 'player',
+      frames: this.anims.generateFrameNumbers('player'),
+      frameRate: 5,
+      repeat: -1
     });
 
-    this.game.scale.updateBounds();
+    // Initialize laser object as null as there are no active lasers at initialization
+    this.laser = null;
 
     // Draw the background image first
     this.background = this.add.image(this.centerX, this.centerY, 'background');
@@ -43,48 +68,114 @@ export default class Game extends Phaser.Scene {
     // "this" here is a reference to this class (the Game scene)
     this.player = new Player(this, this.width / 2, this.height);
 
+    // portalgun
+    this.portalgun = new Portalgun(this, this.width / 2, this.height - 50);
+
     // Create a group of platforms with physics, but with zero gravity
     this.platforms = this.physics.add.group({
       allowGravity: false,
     });
     
     // Create 5 platforms with a random x and y position
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 4; i++) {
       const x = Phaser.Math.Between(40, 400);
-      const y = 150 * i;
+      const y = 200 * i;
 
       new Platform(this, x, y);
     }
 
+    this.pauseOverlay = new PauseOverlay(this, this.width / 2, this.height / 2);
+    this.pauseText = new PauseText(this, this.width / 2 - 150, this.height / 2 - 25);
+
     // Add a collider to this scene. This makes the platforms and the player collide
     // with each other, and we can create a custom function in response to this as
-    // shown
-    this.physics.add.collider(this.platforms, this.player, () => {
-      console.log('Colision detected between the player and one of the platforms');
+    // shown which destroys the current platform upon collision
+    this.physics.add.collider(this.platforms, this.player, (player, platform) => {
+      console.log('Collision between player and platform');
+      platform.destroy();
     });
-
-    this.pauseOverlay = this.add
-        .rectangle(this.width / 2, this.height / 2, 480, 800, 'black', 0.5)
-        .setActive(false)
-        .setVisible(false);
-
-    const pauseStyle = {
-      font: "bold 32px Arial", 
-      fill: "#fff", 
-      boundsAlignH: "center", 
-      boundsAlignV: "middle"
-    };
-
-    this.pauseText = this.add
-        .text(this.width / 2 - 150, this.height / 2 - 25, 'Game is paused', pauseStyle)
-        .setShadow(3, 3, 'rgba(0,0,0,0.5)', 2)
-        .setDisplaySize(300, 50)
-        .setVisible(false)
   }
 
   // Update game objects
   update() {
     this.player.update();
+
+    this.portalgun.update({x: this.player.x, y: this.player.y });
+
+    if (this.didTeleport) {
+
+      /* 
+        If the teleported height was big enough, we must move all objects
+        down and spawn new platforms such that it looks like the camera just moved.
+        Should be accelerated in a while loop such that it looks smooth.
+
+        So, something like:
+
+        if (teleport path was long enough) {
+          cameraFullyMoved = false
+
+          while (!cameraFullyMoved) {
+            accelerate objects downward
+
+            if (objects was moved to the correct offset) {
+              cameraFullyMoved = true
+            }
+          }
+        }
+
+        this should then look like the camera naturally moves as the player progresses.
+      */
+
+      const playerBaseY = this.height - this.player.displayHeight;
+      const offset = playerBaseY - this.player.y;
+
+      console.log(`Player base y: ${playerBaseY}`);
+      console.log(`Player offset: ${offset}`);
+
+      this.platforms.children.iterate((platform) => {
+        platform.y += offset;
+      });
+
+      this.didTeleport = false;
+    }
+
+    if (this.laser != null) {
+      this.laser.update((borderSide) => {
+        this.onLaserReachedTarget(borderSide)
+      })
+    }
+  }
+
+  onLaserReachedTarget(borderSide) {
+    const playerWidth = this.player.displayWidth;
+
+    if (borderSide == BorderSide.LEFT) {
+      this.player.setPosition(
+        0 + playerWidth / 2,
+        this.laser.y
+      );
+
+      this.onPlayerTeleported();
+
+    } else if (borderSide == BorderSide.RIGHT) {
+      this.player.setPosition(
+        this.width - playerWidth / 2,
+        this.laser.y
+      );
+
+      this.onPlayerTeleported();
+
+    } else {
+      this.laser.destroy();
+      this.laser = null;
+    }
+  }
+  
+  onPlayerTeleported() {
+    this.didTeleport = true;
+    this.player.setVelocity(0, 0);
+    this.laser.destroy();
+    this.laser = null;
   }
 
   onGameResumed() {
