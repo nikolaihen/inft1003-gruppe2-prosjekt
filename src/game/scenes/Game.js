@@ -98,6 +98,8 @@ export default class Game extends Phaser.Scene {
 
   // Update game objects
   update() {
+    this.isPortaling = this.laser != null;
+
     this.player.update();
 
     this.portalgun.update({x: this.player.x, y: this.player.y });
@@ -139,10 +141,12 @@ export default class Game extends Phaser.Scene {
       this.didTeleport = false;
     }
 
-    if (this.laser != null) {
-      this.laser.update((borderSide) => {
-        this.onLaserReachedTarget(borderSide)
-      })
+    if (this.isPortaling) {
+      this.laser.update({
+        onLaserReachedTargetCallback: (borderSide) => {
+          this.onLaserReachedTarget(borderSide)
+        }
+      });
     }
   }
 

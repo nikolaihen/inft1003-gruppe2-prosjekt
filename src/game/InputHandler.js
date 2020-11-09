@@ -3,6 +3,7 @@ import Laser from './objects/Laser.js';
 
 export default class InputHandler {
   constructor(scene) {
+
     /** @type {Phaser.Scene} */
     this.scene = scene;
     this.sceneManager = this.scene.scene;

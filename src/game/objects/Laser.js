@@ -11,11 +11,13 @@ export default class Laser extends Phaser.Physics.Arcade.Sprite {
     this.setScale(0.1);
     this.setFlipX(true);
     this.body.setAllowGravity(false);
+    this.scene = scene;
+    this.velocity = 5;
   }
 
-  update(onLaserReachedTargetCallback) {
-    const velocityX = Math.cos(this.scene.laserTargetAngle) * 5;
-    const velocityY = Math.sin(this.scene.laserTargetAngle) * 5;
+  update({onLaserReachedTargetCallback}) {
+    const velocityX = Math.cos(this.scene.laserTargetAngle) * this.velocity;
+    const velocityY = Math.sin(this.scene.laserTargetAngle) * this.velocity;
 
     this.x += velocityX;
     this.y += velocityY;
