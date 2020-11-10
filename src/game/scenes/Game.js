@@ -10,6 +10,9 @@ import Portalgun from '../objects/Portalgun.js';
 import Laser from '../objects/Laser.js';
 import PauseOverlay from '../objects/PauseOverlay.js';
 import PauseText from '../objects/PauseText.js';
+import GameCamera from '../utils/GameCamera.js';
+import { ScoreText, ComboText } from '../objects/ScoreText.js';
+import ComboItem from '../objects/ComboItem.js';
 
 // Input handler
 import InputHandler from '../InputHandler.js';
@@ -23,6 +26,11 @@ export default class Game extends Phaser.Scene {
     this.width = this.game.config.width;
     this.height = this.game.config.height;
     this.cursors = this.input.keyboard.createCursorKeys();
+    this.camera = new GameCamera(this);
+    this.cameraOffset = 0;
+    this.level = 0;
+    this.score = 0;
+    this.combo = 0;
 
     this.load.spritesheet({
       key: 'player', 
@@ -35,21 +43,36 @@ export default class Game extends Phaser.Scene {
       },
     });
 
+    this.load.image('background_cyberpunk', 'assets/background.jpg')
+
     // Load background image
-    this.load.image('background', 'assets/bg_layer1.png');
+    this.load.image('background', 'assets/kornbackground.jpg');
 
     // Load platform image
     this.load.image('platform', 'assets/ground_grass.png');
 
     // Load portal gun
-    this.load.image('portalgun', 'assets/portal-gun.png');
+    this.load.image('portalgun', 'assets/portal-gun-red.png');
 
     // Load laser
     this.load.image('laser', 'assets/laserbeam.png');
+
+    // Load star
+    this.load.image('star', '/assets/star.png');
   }
 
   create() {
     new InputHandler(this);
+
+    this.bgTile = this.add.tileSprite(
+      this.width / 2, 
+      this.height, 
+      this.width,
+      8000,
+      'background'
+    );
+
+    this.bgTile.setOrigin(0.5, 1.0);
 
     this.anims.create({
       key: 'player',
@@ -61,12 +84,14 @@ export default class Game extends Phaser.Scene {
     // Initialize laser object as null as there are no active lasers at initialization
     this.laser = null;
 
-    // Draw the background image first
-    this.background = this.add.image(this.centerX, this.centerY, 'background');
-
     // Create a new intance of the Player class
     // "this" here is a reference to this class (the Game scene)
     this.player = new Player(this, this.width / 2, this.height);
+
+    this.playerPosBeforeTeleporting = {
+      x: this.player.x,
+      y: this.player.y
+    };
 
     // portalgun
     this.portalgun = new Portalgun(this, this.width / 2, this.height - 50);
@@ -75,17 +100,34 @@ export default class Game extends Phaser.Scene {
     this.platforms = this.physics.add.group({
       allowGravity: false,
     });
+
+    // Create a group of combo items
+    this.comboItems = this.physics.add.group({
+      allowGravity: false
+    });
     
     // Create 5 platforms with a random x and y position
-    for (let i = 0; i < 4; i++) {
-      const x = Phaser.Math.Between(40, 400);
-      const y = 200 * i;
+    for (let i = 0; i < 50; i++) {
+      var startY = this.height - 200;
+
+      var x = Phaser.Math.Between(40, 400);
+      var y = startY -= 200 * i;
 
       new Platform(this, x, y);
+
+      console.log(`\n\n${i} % 3: ${i % 3}\n\n`)
+
+      if (i > 0 && i % 3 == 0) {
+        console.log('\n\nCreate new combo item\n\n');
+        new ComboItem(this, x, y - 50);
+      }
     }
 
     this.pauseOverlay = new PauseOverlay(this, this.width / 2, this.height / 2);
     this.pauseText = new PauseText(this, this.width / 2 - 150, this.height / 2 - 25);
+
+    this.scoreText = new ScoreText(this, this.width / 2, 20);
+    this.comboText = new ComboText(this);
 
     // Add a collider to this scene. This makes the platforms and the player collide
     // with each other, and we can create a custom function in response to this as
@@ -98,48 +140,20 @@ export default class Game extends Phaser.Scene {
 
   // Update game objects
   update() {
+    this.scoreText.update(this.score);
+    this.comboText.update(this.combo);
+    this.camera.animate();
+
+    console.log(`IsAnimating: ${this.camera.isAnimating}`);
+
+    this.platforms.children.iterate((platform) => {
+      platform.update(this.camera.isAnimating);
+    });
+
     this.isPortaling = this.laser != null;
 
     this.player.update();
-
-    this.portalgun.update({x: this.player.x, y: this.player.y });
-
-    if (this.didTeleport) {
-
-      /* 
-        If the teleported height was big enough, we must move all objects
-        down and spawn new platforms such that it looks like the camera just moved.
-        Should be accelerated in a while loop such that it looks smooth.
-
-        So, something like:
-
-        if (teleport path was long enough) {
-          cameraFullyMoved = false
-
-          while (!cameraFullyMoved) {
-            accelerate objects downward
-
-            if (objects was moved to the correct offset) {
-              cameraFullyMoved = true
-            }
-          }
-        }
-
-        this should then look like the camera naturally moves as the player progresses.
-      */
-
-      const playerBaseY = this.height - this.player.displayHeight;
-      const offset = playerBaseY - this.player.y;
-
-      console.log(`Player base y: ${playerBaseY}`);
-      console.log(`Player offset: ${offset}`);
-
-      this.platforms.children.iterate((platform) => {
-        platform.y += offset;
-      });
-
-      this.didTeleport = false;
-    }
+    this.portalgun.update();
 
     if (this.isPortaling) {
       this.laser.update({
@@ -176,23 +190,12 @@ export default class Game extends Phaser.Scene {
   }
   
   onPlayerTeleported() {
+    this.score += this.player.y;
+    const offset = Math.abs(this.playerPosBeforeTeleporting.y - this.player.y);
+    this.camera.updateOffset(offset);
     this.didTeleport = true;
     this.player.setVelocity(0, 0);
     this.laser.destroy();
     this.laser = null;
-  }
-
-  onGameResumed() {
-    this.pauseOverlay.setVisible(false);
-    this.pauseText.setVisible(false);
-    this.scene.resume();
-    this.pauseButton.innerText = 'Pause game'
-  }
-
-  onGamePaused() {
-    this.pauseOverlay.setVisible(true);
-    this.pauseText.setVisible(true);
-    this.scene.pause();
-    this.pauseButton.innerText = 'Resume game'
   }
 }

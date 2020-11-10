@@ -8,10 +8,10 @@ export default class Portalgun extends Phaser.Physics.Arcade.Sprite {
     this.body.setAllowGravity(false);
   
     this.setOrigin(0.0, 0.5);
-    this.setScale(0.15, 0.15);
+    this.setScale(0.09);
   }
 
-  update(playerPos) {
+  update() {
     const mousePos = this.scene.mousePos;
 
     if (mousePos != null) {
@@ -23,7 +23,7 @@ export default class Portalgun extends Phaser.Physics.Arcade.Sprite {
       );
   
       this.setRotation(angle);
-      this.setPosition(playerPos.x, playerPos.y);
+      this.setPosition(this.scene.player.x, this.scene.player.y);
       this.body.updateFromGameObject();
     }
   }

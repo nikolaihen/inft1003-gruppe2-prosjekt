@@ -8,6 +8,10 @@
 const randomVelocityInRange = (min, max) => {
   const value = Phaser.Math.Between(min, max);
 
+  if (value < 2) {
+    value += 5;
+  }
+
   /*
    * Since Math.random() returns a random number between 0 and 1, the number will
    * be below 0.5 in 50% of cases, such that we can easily make the chance of getting

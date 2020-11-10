@@ -6,11 +6,15 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url('./assets/background_pixel_art.png')
+  background-image: url('./assets/background_gif.gif');
+  background-size: 100vw;
 }
 
 canvas {
   display: none;
+  border-radius: 10px;
+  border: solid 3px rgb(255, 0, 200);
+  box-shadow: 0 6px 8px 0 rgb(1, 80, 251), 0 6px 20px 0 rgba(9, 255, 0, 0.5);
 }
 
 .visible {

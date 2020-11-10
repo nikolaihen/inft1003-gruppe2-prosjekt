@@ -32,14 +32,14 @@ export default class InputHandler {
     this.scene.pauseOverlay.setVisible(true);
     this.scene.pauseText.setVisible(true);
     this.sceneManager.pause();
-    this.pauseButton.innerText = 'Resume game'
+    this.pauseButton.innerText = 'RESUME'
   }
 
   onGameResumed() {
     this.scene.pauseOverlay.setVisible(false);
     this.scene.pauseText.setVisible(false);
     this.scene.scene.resume();
-    this.pauseButton.innerText = 'Pause game'
+    this.pauseButton.innerText = 'PAUSE'
   }
 
   onMouseDown(event) {
@@ -55,9 +55,25 @@ export default class InputHandler {
 
       this.scene.laser = new Laser(
         this.scene,
-        this.scene.portalgun.body.x, 
+        this.scene.portalgun.body.x,
         this.scene.portalgun.body.y
       );
+
+      this.scene.physics.add.collider(this.scene.platforms, this.scene.laser, (laser, platform) => {
+        platform.destroy();
+        this.scene.combo = 0;
+      });
+
+      this.scene.physics.add.collider(this.scene.comboItems, this.scene.laser, (laser, comboItem) => {
+        console.log('Collision between laser and combo item');
+        comboItem.destroy();
+        this.scene.combo++;
+      });
+
+      this.scene.playerPosBeforeTeleporting = {
+        x: this.scene.player.x,
+        y: this.scene.player.y
+      }
     }
   }
 

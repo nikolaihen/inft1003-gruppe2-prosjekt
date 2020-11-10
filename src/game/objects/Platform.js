@@ -22,7 +22,9 @@ export default class Platform extends Phaser.Physics.Arcade.Image {
     scene.add.existing(this);
     scene.platforms.add(this);
     
-    this.setScale(0.3);
+    this.setScale(0.15, 0.30);
+
+    this.debugShowVelocity = true;
     
     /*
      * Upon instantiation of this object, its velocity on the x-direction is being 
@@ -30,14 +32,32 @@ export default class Platform extends Phaser.Physics.Arcade.Image {
      * This way, every instance of this class creates an object which will have a random speed
      * in a random direction.
      */
-    this.setVelocityX(randomVelocityInRange(60, 120))
-    
-    /*
-     * Here we configure this object to collide with the game-borders as we do in the Player class,
-     * but here we also set the bounce-multiplier for the X and Y value. By giving it 1 and 1 for
-     * X and Y, it will bounce from the world borders with the exact same speed in the X and Y direction
-     * as it had before, only reversed.
-     */
-    this.setCollideWorldBounds(true, 1, 1);
+    this.velocityX = randomVelocityInRange(60, 120);
+    this.velocityXBeforeAnimating = this.velocityX;
+    this.setVelocityX(this.velocityX);
+  }
+
+  update(isAnimating) {
+    const reachedLeftBorder = this.x - this.displayWidth / 2 <= 0;
+    const reachedRightBorder = this.x - this.displayWidth >= this.width;
+
+    if (isAnimating) {
+      this.setVelocityX(0);
+    } else {
+      this.setVelocityX(this.velocityX);
+    }
+
+    if (reachedLeftBorder) {
+      this.velocityX = -this.body.velocity.x;
+      this.setPosition(this.displayWidth / 2 + 1, this.y);
+      this.setVelocityX(this.velocityX);
+      this.body.updateFromGameObject();
+
+    } else if (reachedRightBorder) {
+      this.velocityX = -this.body.velocity.x;
+      this.setPosition(this.x - 1, this.y);
+      this.setVelocityX(this.velocityX);
+      this.body.updateFromGameObject();
+    }
   }
 }
