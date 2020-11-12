@@ -10,13 +10,6 @@ body {
   background-size: 100vw;
 }
 
-canvas {
-  display: none;
-  border-radius: 10px;
-  border: solid 3px rgb(255, 0, 200);
-  box-shadow: 0 6px 8px 0 rgb(1, 80, 251), 0 6px 20px 0 rgba(9, 255, 0, 0.5);
-}
-
 .visible {
   display: flex !important;
 }
@@ -27,10 +20,5 @@ canvas {
 
 .gameContainer {
   display: flex;
-  flex-direction: column;
-}
-
-.gameControls {
-  display: none;
   flex-direction: column;
 }

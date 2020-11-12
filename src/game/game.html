@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./src/game/game.css" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Fredoka+One' rel='stylesheet'>
+  </head>
+  <body>
+
+    <div class="game-container">
+      <div class="game-controls">
+        <div id="menuBtn" class="mainButton">
+          <div class="mainButtonText no-opacity">MENU</div>
+        </div>
+        <div id="restartBtn" class="mainButton">
+          <div class="mainButtonText no-opacity">RESTART</div>
+        </div>
+        <div id="pauseBtn" class="mainButton">
+          <div class="mainButtonText no-opacity">PAUSE</div>
+        </div>
+      </div>
+      
+      <div class="game-window-container">
+        <div class="game-ui-panel">
+          <div class="game-ui-title">Game stats</div>
+    
+          <div class="game-stats">
+            <div class="game-stat">
+              Current score
+            </div>
+            <div id="game-score"></div>
+          </div>
+        </div>
+    
+        <canvas id="game"></canvas>
+    
+        <div class="game-ui-panel">
+          <div class="game-ui-title">Scoreboard</div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="src/game/main.js"></script>
+  </body>
+</html>

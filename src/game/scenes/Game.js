@@ -26,9 +26,9 @@ export default class Game extends Phaser.Scene {
     this.width = this.game.config.width;
     this.height = this.game.config.height;
     this.cursors = this.input.keyboard.createCursorKeys();
+    this.baseDistBetweenPlatforms = 300;
+    this.platformCount = 100;
     this.camera = new GameCamera(this);
-    this.cameraOffset = 0;
-    this.level = 0;
     this.score = 0;
     this.combo = 0;
 
@@ -105,29 +105,14 @@ export default class Game extends Phaser.Scene {
     this.comboItems = this.physics.add.group({
       allowGravity: false
     });
-    
-    // Create 5 platforms with a random x and y position
-    for (let i = 0; i < 50; i++) {
-      var startY = this.height - 200;
 
-      var x = Phaser.Math.Between(40, 400);
-      var y = startY -= 200 * i;
-
-      new Platform(this, x, y);
-
-      console.log(`\n\n${i} % 3: ${i % 3}\n\n`)
-
-      if (i > 0 && i % 3 == 0) {
-        console.log('\n\nCreate new combo item\n\n');
-        new ComboItem(this, x, y - 50);
-      }
-    }
+    this.createPlatformsAndComboItems();
 
     this.pauseOverlay = new PauseOverlay(this, this.width / 2, this.height / 2);
     this.pauseText = new PauseText(this, this.width / 2 - 150, this.height / 2 - 25);
 
-    this.scoreText = new ScoreText(this, this.width / 2, 20);
-    this.comboText = new ComboText(this);
+    /* this.scoreText = new ScoreText(this, this.width / 2, 20);
+    this.comboText = new ComboText(this); */
 
     // Add a collider to this scene. This makes the platforms and the player collide
     // with each other, and we can create a custom function in response to this as
@@ -140,8 +125,6 @@ export default class Game extends Phaser.Scene {
 
   // Update game objects
   update() {
-    this.scoreText.update(this.score);
-    this.comboText.update(this.combo);
     this.camera.animate();
 
     console.log(`IsAnimating: ${this.camera.isAnimating}`);
@@ -190,12 +173,48 @@ export default class Game extends Phaser.Scene {
   }
   
   onPlayerTeleported() {
-    this.score += this.player.y;
-    const offset = Math.abs(this.playerPosBeforeTeleporting.y - this.player.y);
-    this.camera.updateOffset(offset);
+    const offset = this.playerPosBeforeTeleporting.y - this.player.y;
+    const absOffset = Math.abs(this.playerPosBeforeTeleporting.y - this.player.y);
+
+    
+    this.score += offset;
+    document.getElementById('game-score').innerHTML = Math.round(this.score);
+
+    this.camera.updateOffset(absOffset);
     this.didTeleport = true;
     this.player.setVelocity(0, 0);
     this.laser.destroy();
     this.laser = null;
+  }
+
+  createPlatformsAndComboItems() {
+    let previousPlatform;
+    var densityFactor = 1;
+    var startY = this.height - 200;
+
+    for (let i = 0; i < this.platformCount; i++) {
+      let x, y;
+      const distBetweenPlatforms = this.baseDistBetweenPlatforms * densityFactor;
+
+      console.log(`\nDistance: ${distBetweenPlatforms}`);
+
+      x = Phaser.Math.Between(40, 400);
+
+      if (previousPlatform != null) {
+        y = previousPlatform.y - distBetweenPlatforms;
+      } else {
+        y = startY -= distBetweenPlatforms * i;
+      }
+
+      previousPlatform = new Platform(this, x, y);
+
+      if (i > 0 && i % 3 == 0) {
+        new ComboItem(this, x, y - 100);
+      }
+
+      if (i > 1 && i % 10 == 0) {
+        densityFactor -= 0.1;
+      }
+    }
   }
 }

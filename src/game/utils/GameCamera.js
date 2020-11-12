@@ -4,9 +4,8 @@ export default class GameCamera {
     this.scene = scene;
 
     this.isAnimating = false;
-    this.baseOffset = 0;
-    this.cameraOffset = this.baseOffset;
-    this.cameraAnimationSpeed = this.cameraOffset / 100;
+    this.cameraOffset = 0;
+    this.cameraAnimationSpeed = this.cameraOffset / 50;
   }
 
   updateOffset(offset) {
@@ -17,9 +16,9 @@ export default class GameCamera {
   animate() {
     const player = this.scene.player;
 
-    if (player.y < this.scene.height / 3) {
-      this.cameraOffset = this.scene.height - player.y;
-      this.cameraAnimationSpeed = this.cameraOffset / 275;
+    if (player.y < this.scene.height / 2.5) {
+      this.cameraOffset = this.scene.height / 4;
+      this.cameraAnimationSpeed = this.cameraOffset / 50;
     }
 
     if (this.cameraOffset > 0) {
@@ -33,6 +32,8 @@ export default class GameCamera {
         this.cameraOffset = 0;
         this.isAnimating = false;
       }
+
+      this.cameraAnimationSpeed *= 0.98;
     }
   }
 

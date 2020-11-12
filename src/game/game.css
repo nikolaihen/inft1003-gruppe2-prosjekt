@@ -1,0 +1,48 @@
+canvas {
+  border-radius: 10px;
+  border: solid 3px rgb(255, 0, 200);
+  box-shadow: 0 6px 8px 0 rgb(1, 80, 251), 0 6px 20px 0 rgba(9, 255, 0, 0.5);
+}
+
+.game-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.game-window-container {
+  height: 800px;
+  box-sizing: border-box;
+  margin: 0;
+  display: flex;
+  background-size: 100vw;
+}
+
+#game {
+  margin: 0px 35px;
+}
+
+.game-ui-panel {
+  color: white;
+  height: 50vh;
+  width: 20vw;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  padding: 25px;
+  border: solid 3px rgb(255, 0, 200);
+  box-shadow: 0 6px 8px 0 rgb(1, 80, 251), 0 6px 20px 0 rgba(9, 255, 0, 0.5);
+}
+
+.game-ui-title {
+  align-self: center;
+  font-family: 'Fredoka One';
+  font-size: 30px;
+  text-shadow: 2px 2px  2px rgb(1, 80, 251);
+}

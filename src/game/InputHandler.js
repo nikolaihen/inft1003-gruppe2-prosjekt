@@ -8,10 +8,28 @@ export default class InputHandler {
     this.scene = scene;
     this.sceneManager = this.scene.scene;
 
-    this.pauseButton = document.getElementById('pauseBtn');
     this.startButton = document.getElementById('startGameButton');
 
+    this.menuButton = document.getElementById('menuBtn');
+    this.restartButton = document.getElementById('restartBtn');
+    this.pauseButton = document.getElementById('pauseBtn');
+
     this.startButton.addEventListener('click', () => {
+      this.sceneManager.restart();
+    });
+
+    this.menuButton.addEventListener('click', () => {
+      this.sceneManager.stop();
+
+      document.getElementById('game-score').innerHTML = '';
+
+      $('#game-view').hide();
+      $('.menu').show();
+      $('body').css("background-image", "url('./assets/background_gif.gif')");
+    });
+
+    this.restartButton.addEventListener('click', () => {
+      document.getElementById('game-score').innerHTML = '';
       this.sceneManager.restart();
     });
 
@@ -43,9 +61,9 @@ export default class InputHandler {
   }
 
   onMouseDown(event) {
-    if (this.scene.laser == null) {
-      const laserTarget = this.getMousePosition(event);
+    const laserTarget = this.getMousePosition(event);
 
+    if (this.scene.laser == null && laserTarget.y > 0) {
       this.scene.laserTargetAngle = Phaser.Math.Angle.Between(
         this.scene.portalgun.body.x,
         this.scene.portalgun.body.y,
