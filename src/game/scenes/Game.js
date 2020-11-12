@@ -196,8 +196,6 @@ export default class Game extends Phaser.Scene {
       let x, y;
       const distBetweenPlatforms = this.baseDistBetweenPlatforms * densityFactor;
 
-      console.log(`\nDistance: ${distBetweenPlatforms}`);
-
       x = Phaser.Math.Between(40, 400);
 
       if (previousPlatform != null) {
