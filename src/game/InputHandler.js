@@ -8,41 +8,39 @@ export default class InputHandler {
     this.scene = scene;
     this.sceneManager = this.scene.scene;
 
-    this.startButton = document.getElementById('startGameButton');
+    $('#startGameButton').on('click', () => {
+      $('#restartBtn').on('click', () => {
+        $('#game-score').append('');
+        this.sceneManager.restart();
+      });
+  
+      $('#pauseBtn').on('click', () => {
+        this.sceneManager.isPaused() ? this.onGameResumed() : this.onGamePaused();
+      });
+  
+      $(document).on('mousemove', (event) => {
+        this.scene.mousePos = this.getMousePosition(event);
+      });
+  
+      $(document).on('mousedown', (event) => {
+        this.onMouseDown(event);
+      });
 
-    this.menuButton = document.getElementById('menuBtn');
-    this.restartButton = document.getElementById('restartBtn');
-    this.pauseButton = document.getElementById('pauseBtn');
-
-    this.startButton.addEventListener('click', () => {
-      this.sceneManager.restart();
-    });
-
-    this.menuButton.addEventListener('click', () => {
-      this.sceneManager.stop();
-
-      document.getElementById('game-score').innerHTML = '';
-
-      $('#game-view').hide();
-      $('.menu').show();
-      $('body').css("background-image", "url('./assets/background_gif.gif')");
-    });
-
-    this.restartButton.addEventListener('click', () => {
-      document.getElementById('game-score').innerHTML = '';
-      this.sceneManager.restart();
-    });
-
-    this.pauseButton.addEventListener('click', () => {
-      this.sceneManager.isPaused() ? this.onGameResumed() : this.onGamePaused();
-    });
-
-    document.addEventListener('mousemove', (event) => {
-      this.scene.mousePos = this.getMousePosition(event);
-    });
-
-    document.addEventListener('mousedown', (event) => {
-      this.onMouseDown(event);
+      $('#menuBtn').on('click', () => {
+        console.log('\n\n\nMenu button clicked\n\n\n');
+  
+        $('#game-score').html('');
+  
+        $('#game-view').hide();
+        $('.menu').show();
+        $('body').css("background-image", "url('./assets/background_gif.gif')");
+  
+        $(document).off('mousedown');
+        $(document).off('mousemove');
+        $('#restartBtn').off('click');
+        $('#pauseBtn').off('click');
+        $('#menuBtn').off('click');
+      });
     });
   }
 
@@ -50,14 +48,14 @@ export default class InputHandler {
     this.scene.pauseOverlay.setVisible(true);
     this.scene.pauseText.setVisible(true);
     this.sceneManager.pause();
-    this.pauseButton.innerText = 'RESUME'
+    $('#pauseBtn').html('RESUME');
   }
 
   onGameResumed() {
     this.scene.pauseOverlay.setVisible(false);
     this.scene.pauseText.setVisible(false);
     this.scene.scene.resume();
-    this.pauseButton.innerText = 'PAUSE'
+    $('#pauseBtn').html('PAUSE');
   }
 
   onMouseDown(event) {
