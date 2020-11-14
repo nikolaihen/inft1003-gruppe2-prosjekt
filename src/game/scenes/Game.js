@@ -64,9 +64,11 @@ export default class Game extends Phaser.Scene {
   create() {
     new InputHandler(this);
 
+    this.initializeHtml();
+
     this.bgTile = this.add.tileSprite(
       this.width / 2, 
-      this.height, 
+      this.height,
       this.width,
       8000,
       'background'
@@ -120,7 +122,6 @@ export default class Game extends Phaser.Scene {
     // shown which destroys the current platform upon collision
     this.physics.add.collider(this.platforms, this.player, (player, platform) => {
       console.log('Collision between player and platform');
-      const hearts = $('#game-player-health').children().get();
 
       if (this.health == 1) {
         this.onGameOver();
@@ -218,6 +219,12 @@ export default class Game extends Phaser.Scene {
     }, 1000);
   }
 
+  initializeHtml() {
+    for (var i = 1; i <= 3; i++) {
+      $(`#combo-${i}`).hide();
+    }
+  }
+
   resetHtml() {
 
     // Reset hearts
@@ -225,9 +232,8 @@ export default class Game extends Phaser.Scene {
       $(`#heart-${i}`).show();
     }
 
-    $('#game-score').html('');
-    /* $('#game-combo').html('');
-    $('#game-player-health').html(''); */
+    $('#combo-count').html(`x 0`);
+    $('#game-score').html('0');
   }
 
   createPlatformsAndComboItems() {

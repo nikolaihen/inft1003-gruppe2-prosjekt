@@ -28,8 +28,8 @@ export default class InputHandler {
 
       $('#menuBtn').on('click', () => {
         console.log('\n\n\nMenu button clicked\n\n\n');
-  
-        $('#game-score').html('');
+        
+        this.scene.resetHtml();
   
         $('#game-view').hide();
         $('.menu').show();
@@ -78,12 +78,16 @@ export default class InputHandler {
       this.scene.physics.add.collider(this.scene.platforms, this.scene.laser, (laser, platform) => {
         platform.destroy();
         this.scene.combo = 0;
+
+        $('#combo-count').html('x 0');
       });
 
       this.scene.physics.add.collider(this.scene.comboItems, this.scene.laser, (laser, comboItem) => {
         console.log('Collision between laser and combo item');
         comboItem.destroy();
         this.scene.combo++;
+
+        $('#combo-count').html(`x ${this.scene.combo}`);
       });
 
       this.scene.playerPosBeforeTeleporting = {
