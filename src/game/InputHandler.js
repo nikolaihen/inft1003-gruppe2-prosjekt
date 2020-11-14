@@ -45,14 +45,14 @@ export default class InputHandler {
   }
 
   onGamePaused() {
-    this.scene.pauseOverlay.setVisible(true);
+    this.scene.overlay.setVisible(true);
     this.scene.pauseText.setVisible(true);
     this.sceneManager.pause();
     $('#pauseBtn').html('RESUME');
   }
 
   onGameResumed() {
-    this.scene.pauseOverlay.setVisible(false);
+    this.scene.overlay.setVisible(false);
     this.scene.pauseText.setVisible(false);
     this.scene.scene.resume();
     $('#pauseBtn').html('PAUSE');

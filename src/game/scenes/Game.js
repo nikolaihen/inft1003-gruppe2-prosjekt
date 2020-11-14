@@ -8,10 +8,9 @@ import Platform from '../objects/Platform.js';
 import Player from '../objects/Player.js';
 import Portalgun from '../objects/Portalgun.js';
 import Laser from '../objects/Laser.js';
-import PauseOverlay from '../objects/PauseOverlay.js';
-import PauseText from '../objects/PauseText.js';
+import Overlay from '../objects/Overlay.js';
+import CenterText from '../objects/CenterText.js';
 import GameCamera from '../utils/GameCamera.js';
-import { ScoreText, ComboText } from '../objects/ScoreText.js';
 import ComboItem from '../objects/ComboItem.js';
 
 // Input handler
@@ -31,6 +30,7 @@ export default class Game extends Phaser.Scene {
     this.camera = new GameCamera(this);
     this.score = 0;
     this.combo = 0;
+    this.health = 3;
 
     this.load.spritesheet({
       key: 'player', 
@@ -107,9 +107,10 @@ export default class Game extends Phaser.Scene {
     });
 
     this.createPlatformsAndComboItems();
-
-    this.pauseOverlay = new PauseOverlay(this, this.width / 2, this.height / 2);
-    this.pauseText = new PauseText(this, this.width / 2 - 150, this.height / 2 - 25);
+    
+    this.overlay = new Overlay(this, this.width / 2, this.height / 2);
+    this.pauseText = new CenterText(this, 32, 0, 'Game is paused');
+    this.gameOverText = new CenterText(this, 32, 0, 'Game over');
 
     /* this.scoreText = new ScoreText(this, this.width / 2, 20);
     this.comboText = new ComboText(this); */
@@ -126,8 +127,6 @@ export default class Game extends Phaser.Scene {
   // Update game objects
   update() {
     this.camera.animate();
-
-    console.log(`IsAnimating: ${this.camera.isAnimating}`);
 
     this.platforms.children.iterate((platform) => {
       platform.update(this.camera.isAnimating);
@@ -148,9 +147,8 @@ export default class Game extends Phaser.Scene {
 
     if (this.didTeleport) {
       if (this.player.hitBottomBorder()) {
-        console.log('Hit ground')
         this.didTeleport = false;
-        this.scene.restart();
+        this.onGameOver();
       }
     }
   }
@@ -193,6 +191,31 @@ export default class Game extends Phaser.Scene {
     this.player.setVelocity(0, 0);
     this.laser.destroy();
     this.laser = null;
+  }
+
+  onGameOver() {
+    this.gameOverText.setVisible(true);
+    this.overlay.setVisible(true);
+    this.scene.pause();
+    this.score = 0;
+    this.combo = 0;
+    this.health = 3;
+
+    this.clearHtml();
+
+    const id = setInterval(() => {
+      this.gameOverText.setVisible(false);
+      this.overlay.setVisible(false);
+      this.scene.resume();
+      this.scene.restart();
+      clearInterval(id);
+    }, 1000);
+  }
+
+  clearHtml() {
+    $('#game-score').html('');
+    /* $('#game-combo').html('');
+    $('#game-player-health').html(''); */
   }
 
   createPlatformsAndComboItems() {
