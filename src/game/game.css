@@ -46,3 +46,8 @@ canvas {
   font-size: 30px;
   text-shadow: 2px 2px  2px rgb(1, 80, 251);
 }
+
+.player-heart {
+  width: 20px;
+  height: 20px;
+}
