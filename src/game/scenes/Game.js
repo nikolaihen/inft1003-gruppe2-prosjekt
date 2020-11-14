@@ -145,6 +145,14 @@ export default class Game extends Phaser.Scene {
         }
       });
     }
+
+    if (this.didTeleport) {
+      if (this.player.hitBottomBorder()) {
+        console.log('Hit ground')
+        this.didTeleport = false;
+        this.scene.restart();
+      }
+    }
   }
 
   onLaserReachedTarget(borderSide) {
