@@ -14,6 +14,16 @@
   box-shadow: 0 6px 8px 0 rgb(1, 80, 251), 0 6px 20px 0 rgba(9, 255, 0, 0.5);
 }
 
+.main-box-effect {
+  border: solid 3px rgb(255, 0, 200);
+  box-shadow: 0 6px 8px 0 rgb(1, 80, 251), 0 6px 20px 0 rgba(9, 255, 0, 0.5);
+}
+
+.main-circle-effect {
+  border: solid 3px rgb(255, 0, 200);
+  box-shadow: 0 -3px 0px 0 rgba(1, 80, 251, 0.349), 0 3px 3px 0 rgba(9, 255, 0, 0.5);
+}
+
 .no-opacity {
   background-color: rgba(0, 0, 0, 0) !important;
 }
@@ -22,6 +32,16 @@
   background-color: rgba(255, 0, 234, 0.5)
 }
 
-.mainButtonText {
+.text-shadow {
   text-shadow: 2px 2px  2px rgb(1, 80, 251);
+}
+
+.heading-text {
+  font-family: 'Fredoka One'; 
+  font-size: 36px;
+}
+
+.ingress-text {
+  font-family: 'Arial'; 
+  font-size: 18px;
 }
