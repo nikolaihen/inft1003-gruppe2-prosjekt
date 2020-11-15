@@ -15,7 +15,7 @@ export default class Laser extends Phaser.Physics.Arcade.Sprite {
     this.velocity = 5;
   }
 
-  update({onLaserReachedTargetCallback}) {
+  update({onLaserReachedTargetCallback, delta}) {
     var comboMultiplier = (this.scene.combo == 0 ? 1 : this.scene.combo + 1);
 
     if (comboMultiplier > 4) {
@@ -25,8 +25,8 @@ export default class Laser extends Phaser.Physics.Arcade.Sprite {
     const velocityX = Math.cos(this.scene.laserTargetAngle) * this.velocity * comboMultiplier;
     const velocityY = Math.sin(this.scene.laserTargetAngle) * this.velocity * comboMultiplier;
 
-    this.x += velocityX;
-    this.y += velocityY;
+    this.x += velocityX * (delta / this.scene.deltaMultiplier);
+    this.y += velocityY * (delta / this.scene.deltaMultiplier);
 
     if (this.x < 0) {
       onLaserReachedTargetCallback(BorderSide.LEFT);

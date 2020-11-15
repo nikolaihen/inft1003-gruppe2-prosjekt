@@ -37,15 +37,9 @@ export default class Platform extends Phaser.Physics.Arcade.Image {
     this.setVelocityX(this.velocityX);
   }
 
-  update(isAnimating) {
+  update() {
     const reachedLeftBorder = this.x - this.displayWidth / 2 <= 0;
     const reachedRightBorder = this.x - this.displayWidth >= this.width;
-
-    /* if (isAnimating) {
-      this.setVelocityX(0);
-    } else {
-      this.setVelocityX(this.velocityX);
-    } */
 
     if (reachedLeftBorder) {
       this.velocityX = -this.body.velocity.x;
