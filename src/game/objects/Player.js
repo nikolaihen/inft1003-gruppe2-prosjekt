@@ -80,7 +80,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
    * the user during its life-span, and this function will be called at every frame to reflect those
    * changes smoothly to the user (default is 60 times per second). 
    */
-  update() {
+  update(delta) {
 
     /*
      * The scene has a curser-object which we can access by using the stored reference to the scene this
@@ -95,9 +95,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     if (this.y + this.displayHeight / 2 >= this.scene.height) {
       if (cursors.right.isDown) {
-        this.setVelocityX(300);
+        this.setVelocityX(300 * (delta / this.scene.deltaMultiplier));
       } else if (cursors.left.isDown) {
-        this.setVelocityX(-300);
+        this.setVelocityX(-300 * (delta / this.scene.deltaMultiplier));
       } else if (cursors.right.isUp && this.body.velocity.x > 0) {
         this.setVelocityX(0);
       } else if (cursors.left.isUp && this.body.velocity.x < 0) {
