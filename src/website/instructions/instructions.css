@@ -1,0 +1,66 @@
+body {
+  box-sizing: border-box;
+  margin: 0;
+  background-image: url('../../../assets/background_gif_darker.gif');
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+.instructions-container {
+  width: 50%;
+  padding: 15px 50px 50px 50px;
+  background-color: rgb(26, 26, 26);
+  display: flex;
+  flex-direction: column;
+  justify-content: top;
+  align-items: left;
+  border-radius: 20px;
+}
+
+.instructions-title {
+  align-self: center;
+  color: white;
+}
+
+.instructions-ingress {
+  margin-top: 20px;
+  color: white;
+}
+
+.instructions-list {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+.instructions-list-entry {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.instruction-list-index {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: white;
+  border-radius: 50%;
+  font-size: 20px;
+  font-family: 'Fredoka One';
+  font-weight: 800;
+  color: rgb(255, 0, 200);
+  min-width: 32px;
+}
+
+.instruction-list-text {
+  margin-left: 10px;
+  font-size: 18px;
+  color: white;
+}

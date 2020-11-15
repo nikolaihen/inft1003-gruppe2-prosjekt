@@ -105,4 +105,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       }
     }
   }
+
+  hitBottomBorder() {
+    if (this.y + this.displayHeight / 2 > this.scene.height) {
+      return true;
+    }
+
+    return false;
+  }
 }

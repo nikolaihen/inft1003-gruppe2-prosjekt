@@ -8,14 +8,16 @@ import Platform from '../objects/Platform.js';
 import Player from '../objects/Player.js';
 import Portalgun from '../objects/Portalgun.js';
 import Laser from '../objects/Laser.js';
-import PauseOverlay from '../objects/PauseOverlay.js';
-import PauseText from '../objects/PauseText.js';
+import Overlay from '../objects/Overlay.js';
+import CenterText from '../objects/CenterText.js';
 import GameCamera from '../utils/GameCamera.js';
-import { ScoreText, ComboText } from '../objects/ScoreText.js';
 import ComboItem from '../objects/ComboItem.js';
 
 // Input handler
 import InputHandler from '../InputHandler.js';
+
+const scores = [];
+const isMobile = window.innerWidth < 800;
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -23,14 +25,15 @@ export default class Game extends Phaser.Scene {
   }
 
   preload() {
-    this.width = this.game.config.width;
     this.height = this.game.config.height;
+    this.width = this.game.config.width;
     this.cursors = this.input.keyboard.createCursorKeys();
     this.baseDistBetweenPlatforms = 300;
-    this.platformCount = 100;
+    this.platformCount = 1000;
     this.camera = new GameCamera(this);
     this.score = 0;
     this.combo = 0;
+    this.health = 3;
 
     this.load.spritesheet({
       key: 'player', 
@@ -59,6 +62,12 @@ export default class Game extends Phaser.Scene {
 
     // Load star
     this.load.image('star', '/assets/star.png');
+
+    // Load laser shoot audio
+    this.load.audio('shoot', 'assets/sound/laser_shoot.mp3');
+
+    // Load damage taken audio
+    this.load.audio('damage', 'assets/sound/damage_taken.mp3');
   }
 
   create() {
@@ -66,7 +75,7 @@ export default class Game extends Phaser.Scene {
 
     this.bgTile = this.add.tileSprite(
       this.width / 2, 
-      this.height, 
+      this.height,
       this.width,
       8000,
       'background'
@@ -107,18 +116,26 @@ export default class Game extends Phaser.Scene {
     });
 
     this.createPlatformsAndComboItems();
-
-    this.pauseOverlay = new PauseOverlay(this, this.width / 2, this.height / 2);
-    this.pauseText = new PauseText(this, this.width / 2 - 150, this.height / 2 - 25);
-
-    /* this.scoreText = new ScoreText(this, this.width / 2, 20);
-    this.comboText = new ComboText(this); */
+    
+    this.overlay = new Overlay(this, this.width / 2, this.height / 2);
+    this.pauseText = new CenterText(this, 32, 0, 'Game is paused');
+    this.gameOverText = new CenterText(this, 32, 0, 'Game over');
 
     // Add a collider to this scene. This makes the platforms and the player collide
     // with each other, and we can create a custom function in response to this as
     // shown which destroys the current platform upon collision
     this.physics.add.collider(this.platforms, this.player, (player, platform) => {
-      console.log('Collision between player and platform');
+
+      this.sound.play('damage');
+
+      if (this.health == 1) {
+        console.log('Game over by health loss');
+        this.onGameOver();
+      } else {
+        this.health--;
+        $(`#heart-${this.health}`).hide();
+      }
+
       platform.destroy();
     });
   }
@@ -126,8 +143,6 @@ export default class Game extends Phaser.Scene {
   // Update game objects
   update() {
     this.camera.animate();
-
-    console.log(`IsAnimating: ${this.camera.isAnimating}`);
 
     this.platforms.children.iterate((platform) => {
       platform.update(this.camera.isAnimating);
@@ -144,6 +159,13 @@ export default class Game extends Phaser.Scene {
           this.onLaserReachedTarget(borderSide)
         }
       });
+    }
+
+    if (this.didTeleport) {
+      if (this.player.hitBottomBorder()) {
+        this.sound.play('damage');
+        this.onGameOver();
+      }
     }
   }
 
@@ -173,18 +195,82 @@ export default class Game extends Phaser.Scene {
   }
   
   onPlayerTeleported() {
+    var scoreMultiplier = 1;
     const offset = this.playerPosBeforeTeleporting.y - this.player.y;
-    const absOffset = Math.abs(this.playerPosBeforeTeleporting.y - this.player.y);
 
-    
-    this.score += offset;
+    if (this.combo > 3) {
+      scoreMultiplier = this.combo / 2;
+    }
+
+    this.score += offset * scoreMultiplier;
     document.getElementById('game-score').innerHTML = Math.round(this.score);
 
-    this.camera.updateOffset(absOffset);
+    this.camera.updateOffset(Math.abs(offset));
     this.didTeleport = true;
     this.player.setVelocity(0, 0);
     this.laser.destroy();
     this.laser = null;
+  }
+
+  onGameOver() {
+    console.log('onGameOver called');
+    this.gameOverText.setVisible(true);
+    this.overlay.setVisible(true);
+    this.scene.pause();
+
+    if (this.score != 0) {
+      this.updateScoreboard();
+    }
+
+    this.resetGameStats();
+
+    const id = setInterval(() => {
+      this.scene.restart();
+      this.resetHtml();
+
+      clearInterval(id);
+    }, 1000);
+  }
+
+  updateScoreboard() {
+    // Add the new score to the scores array
+    scores.push(this.score);
+
+    // Sort the array from highest to lowest score
+    scores.sort((currentScore, nextScore) => {
+      return (currentScore > nextScore) ? -1 : (currentScore < nextScore) ? 1 : 0; 
+    });
+
+    // Clear the HTML scoreboard
+    $('#scoreboard').empty();
+
+    // Append scoreboard entries with the new score to the HTML scoreboard
+    for (var i = 0; i < scores.length; i++) {
+      const html = `<div id="${i + 1}" class="scoreboard-entry">
+        <span class="scoreboard-entry-index">${i + 1}.</span>
+        <span class="scoreboard-entry-score">${Math.round(scores[i])}</span>
+      </div>`;
+
+      $(html).appendTo('#scoreboard');
+    }
+  }
+
+  resetGameStats() {
+    this.didTeleport = false;
+    this.score = 0;
+    this.combo = 0;
+    this.health = 3;
+  }
+
+  resetHtml() {
+    // Reset health
+    for (var i = 1; i <= 3; i++) {
+      $(`#heart-${i}`).show();
+    }
+
+    // Reset score and combo
+    $('#game-score').html('0');
+    $('#combo-count').html(`x 0`);
   }
 
   createPlatformsAndComboItems() {
@@ -204,13 +290,17 @@ export default class Game extends Phaser.Scene {
         y = startY -= distBetweenPlatforms * i;
       }
 
+      // Save the previous platform
       previousPlatform = new Platform(this, x, y);
 
+      // Create one combo item for every 3rd platform
       if (i > 0 && i % 3 == 0) {
         new ComboItem(this, x, y - 100);
       }
 
-      if (i > 1 && i % 10 == 0) {
+      // Increase the density of platforms for every 20th platform,
+      // but only till the 100th pplatform
+      if (i > 1 && i % 20 == 0 && i < 100) {
         densityFactor -= 0.1;
       }
     }

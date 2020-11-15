@@ -28,6 +28,7 @@ canvas {
 }
 
 .game-ui-panel {
+  overflow: hidden;
   color: white;
   height: 50vh;
   width: 20vw;
@@ -45,4 +46,47 @@ canvas {
   font-family: 'Fredoka One';
   font-size: 30px;
   text-shadow: 2px 2px  2px rgb(1, 80, 251);
+}
+
+.player-heart {
+  width: 36px;
+  height: 36px;
+}
+
+.player-combo {
+  width: 36px;
+  height: 36px;
+}
+
+.game-player-combo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-stat {
+  font-family: 'Fredoka One';
+  font-size: 20px;
+  margin-top: 20px;
+  text-shadow: 2px 2px  2px rgb(1, 80, 251);
+}
+
+.game-stat-number {
+  font-family: 'Fredoka One';
+  font-size: 36px;
+}
+
+.player-combo-count {
+  font-family: 'Fredoka One';
+  font-size: 36px;
+}
+
+.scoreboard-entry {
+  font-family: 'Fredoka One';
+  font-size: 36px;
+  margin: 20px 0px;
+}
+
+.scoreboard-entry-index {
+  color: rgb(255, 0, 200)
 }

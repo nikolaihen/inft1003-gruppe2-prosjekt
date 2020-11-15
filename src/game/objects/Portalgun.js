@@ -27,4 +27,13 @@ export default class Portalgun extends Phaser.Physics.Arcade.Sprite {
       this.body.updateFromGameObject();
     }
   }
+
+  angleToTarget(target) {
+    return Phaser.Math.Angle.Between(
+      this.body.x,
+      this.body.y,
+      target.x,
+      target.y
+    );
+  }
 }

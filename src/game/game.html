@@ -2,6 +2,7 @@
   <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="./src/game/game.css" type="text/css">
+    <link rel="stylesheet" href="../../base_styles.css">
     <link href='https://fonts.googleapis.com/css?family=Fredoka+One' rel='stylesheet'>
   </head>
 
@@ -10,13 +11,13 @@
     <div class="game-container">
       <div class="game-controls">
         <div id="menuBtn" class="mainButton">
-          <div class="mainButtonText no-opacity">MENU</div>
+          <div class="text-shadow no-opacity">MENU</div>
         </div>
         <div id="restartBtn" class="mainButton">
-          <div class="mainButtonText no-opacity">RESTART</div>
+          <div class="text-shadow no-opacity">RESTART</div>
         </div>
         <div id="pauseBtn" class="mainButton">
-          <div class="mainButtonText no-opacity">PAUSE</div>
+          <div class="text-shadow no-opacity">PAUSE</div>
         </div>
       </div>
       
@@ -25,17 +26,43 @@
           <div class="game-ui-title">Game stats</div>
     
           <div class="game-stats">
+
             <div class="game-stat">
               Current score
             </div>
-            <div id="game-score"></div>
+            <div class="game-stat-number" id="game-score">0</div>
+
+            <div class="divider"></div>
+
+            <div class="game-stat">
+              Current combo
+            </div>
+            <div id="game-player-combo">
+              <img class="player-combo" src="../../assets/star.png" alt="Image of star">
+              <span id="combo-count" class="player-combo-count">x 0</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="game-stat">
+              Current health
+            </div>
+            <div id="game-player-health">
+              <img id="heart-1" class="player-heart" src="../../assets/pixel-heart.png" alt="Image of heart">
+              <img id="heart-2" class="player-heart" src="../../assets/pixel-heart.png" alt="Image of heart">
+              <img id="heart-3" class="player-heart" src="../../assets/pixel-heart.png" alt="Image of heart">
+            </div>
+
           </div>
         </div>
-    
-        <canvas id="game"></canvas>
+        
+        <div id="game-canvas">
+          <canvas id="game"></canvas>
+        </div>
     
         <div class="game-ui-panel">
           <div class="game-ui-title">Scoreboard</div>
+          <div id="scoreboard"></div>
         </div>
       </div>
     </div>
