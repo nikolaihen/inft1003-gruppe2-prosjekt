@@ -1,6 +1,5 @@
 export default class GameCamera {
   constructor(scene) {
-
     this.scene = scene;
 
     this.isAnimating = false;
@@ -13,7 +12,7 @@ export default class GameCamera {
     this.cameraAnimationSpeed = offset / 100;
   }
 
-  animate() {
+  animate(delta) {
     const player = this.scene.player;
 
     if (player.y < this.scene.height / 2.5) {
@@ -26,7 +25,7 @@ export default class GameCamera {
       this.animateBackground(this.cameraAnimationSpeed);
       this.animateGameObjects(this.cameraAnimationSpeed);
 
-      this.cameraOffset -= this.cameraAnimationSpeed;
+      this.cameraOffset -= this.cameraAnimationSpeed * (delta / this.scene.deltaMultiplier);
 
       if (this.cameraOffset <= 0) {
         this.cameraOffset = 0;

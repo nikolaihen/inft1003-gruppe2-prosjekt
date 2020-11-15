@@ -25,6 +25,7 @@ export default class Game extends Phaser.Scene {
   }
 
   preload() {
+    this.deltaMultiplier = 7;
     this.height = this.game.config.height;
     this.width = this.game.config.width;
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -141,11 +142,11 @@ export default class Game extends Phaser.Scene {
   }
 
   // Update game objects
-  update() {
-    this.camera.animate();
+  update(time, delta) {
+    this.camera.animate(delta);
 
     this.platforms.children.iterate((platform) => {
-      platform.update(this.camera.isAnimating);
+      platform.update();
     });
 
     this.isPortaling = this.laser != null;
@@ -157,7 +158,8 @@ export default class Game extends Phaser.Scene {
       this.laser.update({
         onLaserReachedTargetCallback: (borderSide) => {
           this.onLaserReachedTarget(borderSide)
-        }
+        },
+        delta: delta
       });
     }
 
