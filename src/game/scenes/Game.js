@@ -151,7 +151,7 @@ export default class Game extends Phaser.Scene {
 
     this.isPortaling = this.laser != null;
 
-    this.player.update();
+    this.player.update(delta);
     this.portalgun.update();
 
     if (this.isPortaling) {
