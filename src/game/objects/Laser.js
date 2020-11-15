@@ -16,7 +16,12 @@ export default class Laser extends Phaser.Physics.Arcade.Sprite {
   }
 
   update({onLaserReachedTargetCallback}) {
-    const comboMultiplier = (this.scene.combo == 0 ? 1 : this.scene.combo + 1);
+    var comboMultiplier = (this.scene.combo == 0 ? 1 : this.scene.combo + 1);
+
+    if (comboMultiplier > 4) {
+      comboMultiplier = 4;
+    }
+
     const velocityX = Math.cos(this.scene.laserTargetAngle) * this.velocity * comboMultiplier;
     const velocityY = Math.sin(this.scene.laserTargetAngle) * this.velocity * comboMultiplier;
 

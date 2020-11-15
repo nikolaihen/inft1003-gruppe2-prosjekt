@@ -28,6 +28,7 @@ canvas {
 }
 
 .game-ui-panel {
+  overflow: hidden;
   color: white;
   height: 50vh;
   width: 20vw;
@@ -78,4 +79,14 @@ canvas {
 .player-combo-count {
   font-family: 'Fredoka One';
   font-size: 36px;
+}
+
+.scoreboard-entry {
+  font-family: 'Fredoka One';
+  font-size: 36px;
+  margin: 20px 0px;
+}
+
+.scoreboard-entry-index {
+  color: rgb(255, 0, 200)
 }

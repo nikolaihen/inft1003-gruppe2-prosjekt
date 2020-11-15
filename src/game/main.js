@@ -8,6 +8,12 @@ $('canvas').ready(() => {
     height: 800,
     canvas: document.querySelector('canvas'),
     scene: Game,
+    scale: {
+      parent: 'game-canvas',
+      mode: Phaser.Scale.NO_CENTER,
+      width: 480,
+      height: 800,
+    },
     physics: {
       default: 'arcade',
       arcade: {
